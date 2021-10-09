@@ -1,4 +1,4 @@
-// <Your name>
+// Tanmoy Paul
 // Main file for Part2(a) of Homework 2.
 // Code will compile and run after you have completed sequence_map.h.
 
@@ -8,10 +8,26 @@
 
 #include <iostream>
 #include <string>
+#include <fstream>
 using namespace std;
 
 namespace {
 
+bool GetNextRecognitionSequence(string &line, string &seq) {
+  seq = "";
+  if (line[0] == '/')
+  {
+    return false;
+  }
+  while (line[0] != '/')
+  {
+    seq += line[0];
+    line = line.substr(1);
+    // line.erase(0,1);
+  }
+  line = line.substr(1);
+  return true;
+}
 
 // @db_filename: an input filename.
 // @a_tree: an input tree of the type TreeType. It is assumed to be
@@ -22,12 +38,33 @@ void QueryTree(const string &db_filename, TreeType &a_tree) {
   // Parse input file @db_filename and feel tree @a_tree
   // Then prompt the user for exactly three strings (do a loop) and
   // provide the results of find() as described in the assignment.
+  string db_line; 
+  // Read the file line-by-line: 
+  ifstream file(db_filename);
+  if (!file.good())
+  {
+    cerr << "Error reading file" << endl;
+  }
+  while (getline(file, db_line)) { 
+    if (db_line[db_line.length() - 1] != '/')
+    {
+      continue;
+    }
+    // Get the first part of the line: 
+    string an_enz_acro = db_line.substr(0, db_line.find("/"));
+    db_line = db_line.substr(db_line.find("/") + 1);
+    string a_reco_seq; 
+    while (GetNextRecognitionSequence(db_line, a_reco_seq)) { 
+      SequenceMap new_sequence_map(a_reco_seq, an_enz_acro); 
+      a_tree.insert(new_sequence_map); 
+    }  // End second while.  
+  }  // End first while.
+  file.close();
 }
 
 }  // namespace
 
-int
-main(int argc, char **argv) {
+int main(int argc, char **argv) {
   if (argc != 3) {
     cout << "Usage: " << argv[0] << " <databasefilename> <tree-type>" << endl;
     return 0;
