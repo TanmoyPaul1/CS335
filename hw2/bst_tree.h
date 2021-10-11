@@ -1,3 +1,12 @@
+/**
+ *  Name: Tanmoy Paul
+ *  Date: 10/09/2021
+ *  Professor: Ionnis Stamos
+ *  Class: CSCI 335
+ * 
+ *  This BinarySearchTree Class provides functions to access and modifythe data of the BinarySearchTree. 
+**/
+
 #ifndef BINARY_SEARCH_TREE_H
 #define BINARY_SEARCH_TREE_H
 
@@ -98,9 +107,9 @@ class BinarySearchTree
     /**
      * Returns true if x is found in the tree.
      */
-    bool contains( const Comparable & x ) const
+    bool contains( const Comparable & x, int &count ) const
     {
-        return contains( x, root );
+        return contains( x, root, ++count );
     }
 
     /**
@@ -150,11 +159,27 @@ class BinarySearchTree
     /**
      * Remove x from the tree. Nothing is done if x is not found.
      */
-    void remove( const Comparable & x )
+    void remove( const Comparable & x, int &count )
     {
-        remove( x, root );
+        remove( x, root, count );
     }
 
+    // counts the total nodes form the beginning of the tree.
+    int totalNodes() const 
+	{
+        return totalNodesHelper(root);
+	}
+    
+    // counts depth of each node in the tree and adds to total.
+    int depth( int depth ) {
+        return depthHelper(root, depth);
+    }
+
+    // finds x and prints it.
+    void print( const Comparable &x) 
+    {
+        printHelper(x, root);
+    }
 
   private:
     struct BinaryNode
@@ -188,7 +213,7 @@ class BinarySearchTree
         else if( t->element < x )
             insert( x, t->right );
         else
-            ;  // Duplicate; do nothing
+            t->element.Merge(x);
     }
     
     /**
@@ -215,18 +240,18 @@ class BinarySearchTree
      * t is the node that roots the subtree.
      * Set the new root of the subtree.
      */
-    void remove( const Comparable & x, BinaryNode * & t )
+    void remove( const Comparable & x, BinaryNode * & t, int &count )
     {
         if( t == nullptr )
             return;   // Item not found; do nothing
         if( x < t->element )
-            remove( x, t->left );
+            remove( x, t->left, ++count );
         else if( t->element < x )
-            remove( x, t->right );
+            remove( x, t->right, ++count );
         else if( t->left != nullptr && t->right != nullptr ) // Two children
         {
-            t->element = findMin( t->right )->element;
-            remove( t->element, t->right );
+            t->element = findMin( t->right, ++count )->element;
+            remove( t->element, t->right, ++count );
         }
         else
         {
@@ -240,13 +265,13 @@ class BinarySearchTree
      * Internal method to find the smallest item in a subtree t.
      * Return node containing the smallest item.
      */
-    BinaryNode * findMin( BinaryNode *t ) const
+    BinaryNode * findMin( BinaryNode *t, int &count ) const
     {
         if( t == nullptr )
             return nullptr;
         if( t->left == nullptr )
             return t;
-        return findMin( t->left );
+        return findMin( t->left, ++count );
     }
 
     /**
@@ -267,14 +292,14 @@ class BinarySearchTree
      * x is item to search for.
      * t is the node that roots the subtree.
      */
-    bool contains( const Comparable & x, BinaryNode *t ) const
+    bool contains( const Comparable & x, BinaryNode *t, int &count ) const
     {
         if( t == nullptr )
             return false;
         else if( x < t->element )
-            return contains( x, t->left );
+            return contains( x, t->left, ++count );
         else if( t->element < x )
-            return contains( x, t->right );
+            return contains( x, t->right, ++count );
         else
             return true;    // Match
     }
@@ -329,6 +354,38 @@ class BinarySearchTree
             return nullptr;
         else
             return new BinaryNode{ t->element, clone( t->left ), clone( t->right ) };
+    }
+
+    // returns the total number of nodes of the tree
+    int totalNodesHelper( BinaryNode *t )const 
+	{
+        int count = 0;
+        if( t != nullptr ) {
+            count = 1 + totalNodesHelper( t->left ) + totalNodesHelper( t->right );
+        }
+        return count;
+    }
+
+    // adds up the amount of child nodes for t 
+    int depthHelper(BinaryNode *t, int depth) 
+	{
+        if (t == nullptr)
+            return 0;
+        else
+            return depth + depthHelper(t->left, depth+1) + depthHelper(t->right, depth+1);
+    }
+	
+    // finds and prints the element in t that has the same value as x
+    void printHelper( const Comparable &x, BinaryNode *t ) 
+	{
+        if( t == nullptr )
+            return;
+        else if( x < t->element )
+            printHelper( x, t->left );
+        else if( t->element < x )
+            printHelper( x, t->right );
+        else
+            cout << t->element;
     }
 };
 

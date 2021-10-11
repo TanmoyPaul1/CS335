@@ -4,7 +4,7 @@
  *  Professor: Ionnis Stamos
  *  Class: CSCI 335
  * 
- *  The AvlTree Class provides functions to access and modify the data of the AvlTree. 
+ *  This is the modified version of the avl_tree.h file. 
 **/
 
 #ifndef AVL_TREE_H
@@ -206,13 +206,13 @@ class AvlTree
     {
         if( t == nullptr )
             t = new AvlNode{ x, nullptr, nullptr };
-        else if( x < t->element )
+        else if( x < t->element && !x.isEmpty())
             insert( x, t->left );
-        else if( t->element < x )
+        else if( t->element < x && !x.isEmpty())
             insert( x, t->right );
         else
             t->element.Merge(x);
-        
+
         balance( t );
     }
 
@@ -466,8 +466,16 @@ class AvlTree
      */
     void doubleWithLeftChild( AvlNode * & k3 )
     {
-        rotateWithRightChild( k3->left );
-        rotateWithLeftChild( k3 );
+        AvlNode *k1 = k3->left;
+        AvlNode *k2 = k1->right;
+        k1->right = k2->left;
+        k2->left = k1;
+        k3->left = k2->right;
+        k2->right = k3;
+        k1->height = max(height(k1->left), height(k1->right)) + 1;
+        k3->height = max(height(k3->left), height(k3->right)) + 1;
+        k2->height = max(k1->height, k3->height) + 1;
+        k3 = k2;
     }
 
     /**
@@ -478,8 +486,16 @@ class AvlTree
      */
     void doubleWithRightChild( AvlNode * & k1 )
     {
-        rotateWithLeftChild( k1->right );
-        rotateWithRightChild( k1 );
+        AvlNode *k2 = k1->right;
+        AvlNode *k3 = k2->left;
+        k2->left = k3->right;
+        k3->right = k2;
+        k1->right = k3->left;
+        k3->left = k1;
+        k1->height = max(height(k1->left), height(k1->right)) + 1;
+        k2->height = max(height(k2->left), height(k2->right)) + 1;
+        k3->height = max(k1->height, k2->height) + 1;
+        k1 = k3;
     }
 };
 
