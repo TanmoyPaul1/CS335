@@ -1,6 +1,15 @@
-// Tanmoy Paul
-// Main file for Part2(a) of Homework 2.
-// Code will compile and run after you have completed sequence_map.h.
+/**
+ *  Name: Tanmoy Paul
+ *  Date: 10/09/2021
+ *  Professor: Ionnis Stamos
+ *  Class: CSCI 335
+ * 
+ *  Main file for Part2(a) of Homework 2.
+ *  Code will compile and run after you have completed sequence_map.h.
+ * 
+ *  This file parses two files and creates SequenceMaps and adds them to the trees. 
+ *  The required inputs for Part 2A are requested here and the matching enzyme acronyms are printed. 
+**/
 
 #include "avl_tree.h"
 #include "bst_tree.h"
@@ -44,6 +53,7 @@ void QueryTree(const string &db_filename, TreeType &a_tree) {
   if (!file.good())
   {
     cerr << "Error reading file" << endl;
+    exit(1);
   }
   while (getline(file, db_line)) { 
     if (db_line[db_line.length() - 1] != '/')
@@ -60,6 +70,22 @@ void QueryTree(const string &db_filename, TreeType &a_tree) {
     }  // End second while.  
   }  // End first while.
   file.close();
+
+  string sequence;
+  int temp_counter;
+  for (int i = 0; i < 3; i++)
+  {
+    getline(cin, sequence);
+    SequenceMap map{sequence, ""};
+    if(a_tree.contains(map, temp_counter))
+    {
+      a_tree.print(map); 
+    }
+    else
+    {
+      std::cout << "Not Found\n";
+    }
+  }
 }
 
 }  // namespace
@@ -76,11 +102,13 @@ int main(int argc, char **argv) {
   if (param_tree == "BST") {
     BinarySearchTree<SequenceMap> a_tree;
     QueryTree(db_filename, a_tree);
-  } else if (param_tree == "AVL") {
+  } 
+  else if (param_tree == "AVL") {
     AvlTree<SequenceMap> a_tree;
     QueryTree(db_filename, a_tree);
-  } else {
-    cout << "Uknown tree type " << param_tree << " (User should provide BST, or AVL)" << endl;
+  } 
+  else {
+    cout << "Unknown tree type " << param_tree << " (User should provide BST, or AVL)" << endl;
   }
   return 0;
 }

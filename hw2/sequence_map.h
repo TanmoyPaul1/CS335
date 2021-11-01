@@ -4,10 +4,14 @@
  *  Professor: Ionnis Stamos
  *  Class: CSCI 335
  * 
+ *  This file provides headers and implementations for the big five. 
+ *  The comparison operator is overloaded and a Merge function is added. 
 **/
 
 #include <vector>
 #include <string>
+#include <ostream>
+using namespace std;
 
 class SequenceMap {
     public:
@@ -16,19 +20,27 @@ class SequenceMap {
         {}
 
         // Copy-constructor.
-        SequenceMap(const SequenceMap &rhs) : recognition_sequence_(rhs.recognition_sequence_), enzyme_acronyms_(rhs.enzyme_acronyms_)
-        {}
+        SequenceMap(const SequenceMap &rhs) {
+            recognition_sequence_ = rhs.recognition_sequence_;
+            for(size_t i=0; i<rhs.enzyme_acronyms_.size(); i++)
+                enzyme_acronyms_.push_back(rhs.enzyme_acronyms_[i]);
+        }
 
         // Copy-assignment.
         SequenceMap& operator=(const SequenceMap &rhs) {
-            SequenceMap copy = rhs;
-            std::swap(*this, copy);
+            enzyme_acronyms_.clear();
+            recognition_sequence_ = rhs.recognition_sequence_;
+            for(size_t i=0; i<rhs.enzyme_acronyms_.size(); ++i)
+                enzyme_acronyms_.push_back(rhs.enzyme_acronyms_[i]);
             return *this;
         }
         
         // Move-constructor. 
-        SequenceMap(SequenceMap &&rhs) : recognition_sequence_(std::move(rhs.recognition_sequence_)), enzyme_acronyms_(std::move(rhs.enzyme_acronyms_))
-        {}
+        SequenceMap(SequenceMap &&rhs)
+        {
+            recognition_sequence_ = rhs.recognition_sequence_;
+            enzyme_acronyms_ = std::move(rhs.enzyme_acronyms_);
+        }
         
         // Move-assignment.
         SequenceMap& operator=(SequenceMap &&rhs) {
@@ -37,33 +49,30 @@ class SequenceMap {
             return *this;
         }
 
-        // Deconstructor
-        ~SequenceMap() {
-            recognition_sequence_ = "";
-            enzyme_acronyms_.clear();
-        }
-
-        string recognition_sequence() const {
-            return recognition_sequence_;
-        }
-
-        vector<string> enzyme_acronyms() const {
-            return enzyme_acronyms_;
-        }
-
         // constructs a SequenceMap from two strings
         SequenceMap(const string &a_rec_seq, const string &an_enz_acro) {
             recognition_sequence_ = a_rec_seq;
             enzyme_acronyms_.push_back(an_enz_acro);
         }
 
+        // Deconstructor
+        ~SequenceMap() {
+            recognition_sequence_ = "";
+            enzyme_acronyms_.clear();
+        }
+
         // operates based on the regular string comparison between 
         // the recognition_sequence_ strings
         bool operator<(const SequenceMap &rhs) const {
-            return (recognition_sequence_.compare(rhs.recognition_sequence()) < 0);
+            return (recognition_sequence_.compare(rhs.recognition_sequence_) < 0);
         }
 
-    friend std::ostream &operator<<(std::ostream &output, const SequenceMap &some_map) {
+        bool isEmpty() const {
+            return recognition_sequence_.empty();
+        }
+
+    // puts all the enzyme acronyms into the output stream 
+    friend ostream &operator<<(std::ostream &output, const SequenceMap &some_map) {
         // output << some_map.recognition_sequence_ << std::endl;
         if (some_map.enzyme_acronyms_.size() == 0)
             output << "Not Found";
