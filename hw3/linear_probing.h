@@ -4,11 +4,11 @@
  *  Professor: Ionnis Stamos
  *  Class: CSCI 335
  * 
- *  quadratic_probing.h: a hash table using quadratic probing
+ *  linear_probing.h: a hash table using linear probing
 **/
 
-#ifndef QUADRATIC_PROBING_H
-#define QUADRATIC_PROBING_H
+#ifndef LINEAR_PROBING_H
+#define LINEAR_PROBING_H
 
 #include <vector>
 #include <algorithm>
@@ -18,7 +18,7 @@
 namespace {
 
 // Internal method to test if a positive number is prime.
-bool IsPrime(size_t n) {
+bool IsPrimeLinear(size_t n) {
   if( n == 2 || n == 3 )
     return true;
   
@@ -34,10 +34,10 @@ bool IsPrime(size_t n) {
 
 
 // Internal method to return a prime number at least as large as n.
-int NextPrime(size_t n) {
+int NextPrimeLinear(size_t n) {
   if (n % 2 == 0)
     ++n;  
-  while (!IsPrime(n)) n += 2;  
+  while (!IsPrimeLinear(n)) n += 2;  
   return n;
 }
 
@@ -46,11 +46,11 @@ int NextPrime(size_t n) {
 
 // Quadratic probing implementation.
 template <typename HashedObj>
-class HashTable {
+class HashTableLinear {
  public:
   enum EntryType {ACTIVE, EMPTY, DELETED};
 
-  explicit HashTable(size_t size = 101) : array_(NextPrime(size))
+  explicit HashTableLinear(size_t size = 101) : array_(NextPrimeLinear(size))
     { MakeEmpty(); }
   
   bool Contains(const HashedObj & x) const {
@@ -147,15 +147,12 @@ class HashTable {
   size_t FindPos(const HashedObj & x) const {
     size_t offset = 1;
     size_t current_pos = InternalHash(x);
-    int collisions = 1;
       
     while (array_[current_pos].info_ != EMPTY && array_[current_pos].element_ != x) {
+      collisions_++;
       current_pos += offset;  // Compute ith probe.
-      offset += 2;
-      collisions++;
       if (current_pos >= array_.size()) current_pos -= array_.size();
     }
-    collisions_ += collisions - 1;
     return current_pos;
   }
 
@@ -163,7 +160,7 @@ class HashTable {
     std::vector<HashEntry> old_array = array_;
 
     // Create new double-sized, empty table.
-    array_.resize(NextPrime(2 * old_array.size()));
+    array_.resize(NextPrimeLinear(2 * old_array.size()));
     for (auto & entry : array_) entry.info_ = EMPTY;
     
     // Copy table over.
@@ -176,8 +173,8 @@ class HashTable {
   
   size_t InternalHash(const HashedObj & x) const {
     static std::hash<HashedObj> hf;
-    return hf(x) % array_.size( );
+    return hf(x) % array_.size();
   }
 };
 
-#endif  // QUADRATIC_PROBING_H
+#endif  // LINEAR_PROBING_H

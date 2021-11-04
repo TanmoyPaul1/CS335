@@ -4,11 +4,11 @@
  *  Professor: Ionnis Stamos
  *  Class: CSCI 335
  * 
- *  quadratic_probing.h: a hash table using quadratic probing
+ *  double_hashing.h: a hash table using 2 hash functions
 **/
 
-#ifndef QUADRATIC_PROBING_H
-#define QUADRATIC_PROBING_H
+#ifndef DOUBLE_HASHING_H
+#define DOUBLE_HASHING_H
 
 #include <vector>
 #include <algorithm>
@@ -18,7 +18,7 @@
 namespace {
 
 // Internal method to test if a positive number is prime.
-bool IsPrime(size_t n) {
+bool IsPrimeDouble(size_t n) {
   if( n == 2 || n == 3 )
     return true;
   
@@ -34,23 +34,23 @@ bool IsPrime(size_t n) {
 
 
 // Internal method to return a prime number at least as large as n.
-int NextPrime(size_t n) {
+int NextPrimeDouble(size_t n) {
   if (n % 2 == 0)
     ++n;  
-  while (!IsPrime(n)) n += 2;  
+  while (!IsPrimeDouble(n)) n += 2;  
   return n;
 }
 
 }  // namespace
 
 
-// Quadratic probing implementation.
+// Double Hashing implementation.
 template <typename HashedObj>
-class HashTable {
+class HashTableDouble {
  public:
   enum EntryType {ACTIVE, EMPTY, DELETED};
 
-  explicit HashTable(size_t size = 101) : array_(NextPrime(size))
+  explicit HashTableDouble(size_t size = 101) : array_(NextPrimeDouble(size))
     { MakeEmpty(); }
   
   bool Contains(const HashedObj & x) const {
@@ -124,6 +124,11 @@ class HashTable {
     collisions_ = 0;
   }	
 
+  void rvalue(int r)
+  {
+    rvalue_ = r;
+  }
+
  private:        
   struct HashEntry {
     HashedObj element_;
@@ -140,22 +145,19 @@ class HashTable {
   std::vector<HashEntry> array_;
   size_t current_size_;
   mutable size_t collisions_;
+  int rvalue_ = 99;
   
   bool IsActive(size_t current_pos) const
   { return array_[current_pos].info_ == ACTIVE; }
 
   size_t FindPos(const HashedObj & x) const {
-    size_t offset = 1;
     size_t current_pos = InternalHash(x);
-    int collisions = 1;
-      
-    while (array_[current_pos].info_ != EMPTY && array_[current_pos].element_ != x) {
-      current_pos += offset;  // Compute ith probe.
-      offset += 2;
-      collisions++;
+    while (array_[current_pos].info_ != EMPTY && array_[current_pos].element_ != x)
+    {
+      collisions_++;
+      current_pos += SecondHash(x);
       if (current_pos >= array_.size()) current_pos -= array_.size();
     }
-    collisions_ += collisions - 1;
     return current_pos;
   }
 
@@ -163,7 +165,7 @@ class HashTable {
     std::vector<HashEntry> old_array = array_;
 
     // Create new double-sized, empty table.
-    array_.resize(NextPrime(2 * old_array.size()));
+    array_.resize(NextPrimeDouble(2 * old_array.size()));
     for (auto & entry : array_) entry.info_ = EMPTY;
     
     // Copy table over.
@@ -178,6 +180,11 @@ class HashTable {
     static std::hash<HashedObj> hf;
     return hf(x) % array_.size( );
   }
+
+  size_t SecondHash(const HashedObj & x) const {
+    static std::hash<HashedObj> hf;
+    return (rvalue_ - (hf(x) % rvalue_));
+  }
 };
 
-#endif  // QUADRATIC_PROBING_H
+#endif  // DOUBLE_HASHING_H
