@@ -1,6 +1,6 @@
 // Homework 4
 // Testing Sorting Algorithms
-// YOUR NAME
+// Tanmoy Paul
 
 #include "Sort.h"
 #include <chrono>
@@ -36,14 +36,24 @@ void TestTiming() {
 // Generates and returns random vector of size @size_of_vector.
 vector<int> GenerateRandomVector(size_t size_of_vector) {
   // Use rand() to generate random integer
-  // Add code
+  vector<int> v(size_of_vector);
+  for (size_t i = 0; i < size_of_vector; ++i)
+  {
+    v[i] = rand();
+  }
+  return v; 
 }
 
 // Generates and returns sorted vector of size @size_of_vector.
 // If @smaller_to_larger is true, returns vector sorted from small to large.
 // Otherwise returns vector sorted from large to small
 vector<int> GenerateSortedVector(size_t size_of_vector, bool smaller_to_larger) {
-  // Add code
+  vector<int> v = GenerateRandomVector(size_of_vector);
+  if (smaller_to_larger)
+    sort(v.begin(), v.end());
+  else
+    sort(v.begin(), v.end(), greater<int>());
+  return v;
 }
 
 // Verifies that a vector is sorted given a comparator.
@@ -51,7 +61,13 @@ vector<int> GenerateSortedVector(size_t size_of_vector, bool smaller_to_larger) 
 // iff less_than() is true for all pairs.
 template <typename Comparable, typename Comparator>
 bool VerifyOrder(const vector<Comparable> &input, Comparator less_than) {
-  // Add code
+  vector<Comparable> temp = input;
+  sort(input.begin(), input.end(), less_than);
+  for(size_t i = 0; i < temp.size(); ++i)
+  {
+    if (input[i] != temp[i])  return false;
+  }
+  return true; 
 }
 
 // Wrapper function to test different sorting algorithms. See homework's PDF for details.

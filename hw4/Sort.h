@@ -1,5 +1,5 @@
 // Code from textbook
-// Modified by: YOUR NAME
+// Modified by: Tanmoy Paul
 
 #ifndef SORT_H
 #define SORT_H
@@ -30,7 +30,6 @@ void insertionSort( vector<Comparable> & a )
     }
 }
 
-
 /**
  * Internal insertion sort routine for subarrays
  * that is used by quicksort.
@@ -52,8 +51,6 @@ void insertionSort( vector<Comparable> & a, int left, int right )
     }
 }
 
-
-
 /**
  * Shellsort, using Shell's (poor) increments.
  */
@@ -70,21 +67,6 @@ void shellsort( vector<Comparable> & a )
                 a[ j ] = std::move( a[ j - gap ] );
             a[ j ] = std::move( tmp );
         }
-}
-
-/**
- * Standard heapsort.
- */
-template <typename Comparable>
-void heapsort( vector<Comparable> & a )
-{
-    for( int i = a.size( ) / 2 - 1; i >= 0; --i )  /* buildHeap */
-        percDown( a, i, a.size( ) );
-    for( int j = a.size( ) - 1; j > 0; --j )
-    {
-        std::swap( a[ 0 ], a[ j ] );               /* deleteMax */
-        percDown( a, 0, j );
-    }
 }
 
 /**
@@ -123,36 +105,19 @@ void percDown( vector<Comparable> & a, int i, int n )
 }
 
 /**
- * Internal method that makes recursive calls.
- * a is an array of Comparable items.
- * tmpArray is an array to place the merged result.
- * left is the left-most index of the subarray.
- * right is the right-most index of the subarray.
+ * Standard heapsort.
  */
 template <typename Comparable>
-void mergeSort( vector<Comparable> & a,
-                vector<Comparable> & tmpArray, int left, int right )
+void heapsort( vector<Comparable> & a )
 {
-    if( left < right )
+    for( int i = a.size( ) / 2 - 1; i >= 0; --i )  /* buildHeap */
+        percDown( a, i, a.size( ) );
+    for( int j = a.size( ) - 1; j > 0; --j )
     {
-        int center = ( left + right ) / 2;
-        mergeSort( a, tmpArray, left, center );
-        mergeSort( a, tmpArray, center + 1, right );
-        merge( a, tmpArray, left, center + 1, right );
+        std::swap( a[ 0 ], a[ j ] );               /* deleteMax */
+        percDown( a, 0, j );
     }
 }
-
-/**
- * Mergesort algorithm (driver).
- */
-template <typename Comparable>
-void mergeSort( vector<Comparable> & a )
-{
-    vector<Comparable> tmpArray( a.size( ) );
-
-    mergeSort( a, tmpArray, 0, a.size( ) - 1 );
-}
-
 
 /**
  * Internal method that merges two sorted halves of a subarray.
@@ -188,6 +153,36 @@ void merge( vector<Comparable> & a, vector<Comparable> & tmpArray,
         a[ rightEnd ] = std::move( tmpArray[ rightEnd ] );
 }
 
+
+/**
+ * Internal method that makes recursive calls.
+ * a is an array of Comparable items.
+ * tmpArray is an array to place the merged result.
+ * left is the left-most index of the subarray.
+ * right is the right-most index of the subarray.
+ */
+template <typename Comparable>
+void mergeSort( vector<Comparable> & a, vector<Comparable> & tmpArray, int left, int right )
+{
+    if( left < right )
+    {
+        int center = ( left + right ) / 2;
+        mergeSort( a, tmpArray, left, center );
+        mergeSort( a, tmpArray, center + 1, right );
+        merge( a, tmpArray, left, center + 1, right );
+    }
+}
+
+/**
+ * Mergesort algorithm (driver).
+ */
+template <typename Comparable>
+void mergeSort( vector<Comparable> & a )
+{
+    vector<Comparable> tmpArray( a.size( ) );
+
+    mergeSort( a, tmpArray, 0, a.size( ) - 1 );
+}
 
 /**
  * Return median of left, center, and right.
@@ -336,12 +331,10 @@ void SORT( vector<Comparable> & items )
         std::move( begin( same ), end( same ), begin( items ) + smaller.size( ) );
         std::move( begin( larger ), end( larger ), end( items ) - larger.size( ) );
 
-/*
-        items.clear( );
-        items.insert( end( items ), begin( smaller ), end( smaller ) );
-        items.insert( end( items ), begin( same ), end( same ) );
-        items.insert( end( items ), begin( larger ), end( larger ) );
-*/
+        // items.clear( );
+        // items.insert( end( items ), begin( smaller ), end( smaller ) );
+        // items.insert( end( items ), begin( same ), end( same ) );
+        // items.insert( end( items ), begin( larger ), end( larger ) );
     }
 }
 
@@ -351,9 +344,7 @@ void SORT( vector<Comparable> & items )
  * function object.
  */
 template <typename RandomIterator, typename Comparator>
-void insertionSort( const RandomIterator & begin,
-                    const RandomIterator & end,
-                    Comparator lessThan )
+void insertionSort( const RandomIterator & begin, const RandomIterator & end, Comparator lessThan )
 {
     if( begin == end )
         return;
@@ -373,8 +364,7 @@ void insertionSort( const RandomIterator & begin,
  * The two-parameter version calls the three parameter version, using C++11 decltype
  */
 template <typename RandomIterator>
-void insertionSort( const RandomIterator & begin,
-                    const RandomIterator & end )
+void insertionSort( const RandomIterator & begin, const RandomIterator & end )
 {
     insertionSort( begin, end, less<decltype(*begin )>{ } );
 }
