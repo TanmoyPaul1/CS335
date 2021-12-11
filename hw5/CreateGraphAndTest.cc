@@ -4,7 +4,7 @@
  *  Professor: Ionnis Stamos
  *  Class: CSCI 335
  * 
- *  This is the CreateGraphAndTest.cc file. 
+ *  This is the CreateGraphAndTest.cc file which creates the graph and prints adjacencies. 
 **/
 
 #include "graph.h"
